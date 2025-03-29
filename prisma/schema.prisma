@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Exportacao {
+  id         Int      @id @default(autoincrement())
+  co_ano     Int      @db.SmallInt 
+  co_mes     Int?     @db.SmallInt
+  co_ncm     String  @db.VarChar(8)
+  co_unid    String?  @db.VarChar(2)
+  co_pais    String?  @db.VarChar(3)
+  sg_uf_ncm  String?  @db.VarChar(2)
+  co_via     String?  @db.VarChar(2)
+  co_urf     String?  @db.VarChar(7)
+  qt_estat   Decimal? @db.Decimal(15, 2)
+  kg_liquido Decimal? @db.Decimal(10, 3)
+  vl_fob     Decimal? @db.Decimal(15, 2)
+
+  @@map("exportacao")
+}
+
+model Importacao {
+  id         Int      @id @default(autoincrement())
+  co_ano     Int?     @db.SmallInt
+  co_mes     Int?     @db.SmallInt
+  co_ncm     String  @db.VarChar(8)
+  co_unid    String?  @db.VarChar(2)
+  co_pais    String?  @db.VarChar(3)
+  sg_uf_ncm  String?  @db.VarChar(2)
+  co_via     String?  @db.VarChar(2)
+  co_urf     String?  @db.VarChar(7)
+  qt_estat   Decimal? @db.Decimal(12, 2)  // Aumentando a precisão para 12 dígitos no total
+  kg_liquido Decimal? @db.Decimal(10, 3)
+  vl_fob     Decimal? @db.Decimal(15, 2)
+  vl_frete   Decimal? @db.Decimal(15, 2)
+  vl_seguro  Decimal? @db.Decimal(15, 2)
+
+  @@map("importacao")
+
+}
+
