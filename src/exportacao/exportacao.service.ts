@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
@@ -79,7 +80,7 @@ export class ExportacaoService {
           key === 'kg_liquido' ||
           key === 'vl_fob'
         ) {
-          where[key] = new Prisma.Decimal(params[key] || '0');
+          where[key] = new Decimal(params[key] || '0');
         } else {
           where[key] = params[key];
         }
