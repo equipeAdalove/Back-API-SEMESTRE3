@@ -8,39 +8,194 @@ datasource db {
 }
 
 model Exportacao {
-  id         Int      @id @default(autoincrement())
-  co_ano     Int      @db.SmallInt 
-  co_mes     Int?     @db.SmallInt
+  id         Int     @id @default(autoincrement())
+  co_ano     Int
+  co_mes     Int
   co_ncm     String  @db.VarChar(8)
-  co_unid    String?  @db.VarChar(2)
-  co_pais    String?  @db.VarChar(3)
-  sg_uf_ncm  String?  @db.VarChar(2)
-  co_via     String?  @db.VarChar(2)
-  co_urf     String?  @db.VarChar(7)
-  qt_estat   Decimal? @db.Decimal(15, 2)
-  kg_liquido Decimal? @db.Decimal(10, 3)
-  vl_fob     Decimal? @db.Decimal(15, 2)
+  co_unid    Int
+  co_pais    Int
+  sg_uf_ncm  String  @db.VarChar(2)
+  co_via     Int
+  co_urf     Int
+  qt_estat   Decimal @db.Decimal(20, 4)
+  kg_liquido Decimal @db.Decimal(20, 4)
+  vl_fob     Decimal @db.Decimal(20, 2)
 
   @@map("exportacao")
 }
 
 model Importacao {
-  id         Int      @id @default(autoincrement())
-  co_ano     Int?     @db.SmallInt
-  co_mes     Int?     @db.SmallInt
+  id         Int     @id @default(autoincrement())
+  co_ano     Int
+  co_mes     Int
   co_ncm     String  @db.VarChar(8)
-  co_unid    String?  @db.VarChar(2)
-  co_pais    String?  @db.VarChar(3)
-  sg_uf_ncm  String?  @db.VarChar(2)
-  co_via     String?  @db.VarChar(2)
-  co_urf     String?  @db.VarChar(7)
-  qt_estat   Decimal? @db.Decimal(12, 2)  // Aumentando a precisão para 12 dígitos no total
-  kg_liquido Decimal? @db.Decimal(10, 3)
-  vl_fob     Decimal? @db.Decimal(15, 2)
-  vl_frete   Decimal? @db.Decimal(15, 2)
-  vl_seguro  Decimal? @db.Decimal(15, 2)
+  co_unid    Int
+  co_pais    Int
+  sg_uf_ncm  String  @db.VarChar(2)
+  co_via     Int
+  co_urf     Int
+  qt_estat   Decimal @db.Decimal(20, 4)
+  kg_liquido Decimal @db.Decimal(20, 4)
+  vl_fob     Decimal @db.Decimal(20, 2)
+  vl_frete   Decimal @db.Decimal(20, 2)
+  vl_seguro  Decimal @db.Decimal(20, 2)
 
   @@map("importacao")
-
 }
 
+model aux_estado_ano {
+  ano            Int
+  sg_uf_ncm      String   @db.VarChar(2)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([ano, sg_uf_ncm])
+}
+
+model aux_estado_ncm_ano {
+  ano            Int
+  sg_uf_ncm      String   @db.VarChar(2)
+  co_ncm         String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([ano, sg_uf_ncm, co_ncm])
+}
+
+model aux_estado_ncm_total {
+  sg_uf_ncm      String   @db.VarChar(2)
+  co_ncm         String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([sg_uf_ncm, co_ncm])
+}
+
+model aux_estado_total {
+  sg_uf_ncm      String   @id @db.VarChar(2)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+}
+
+model aux_municipio_sh4_ano {
+  tipo             String   @db.VarChar(20)
+  ano              Int
+  co_mun           String   @db.VarChar(10)
+  sg_uf_mun        String?  @db.VarChar(2)
+  sh4              String   @db.VarChar(10)
+  kg_liquido_total Decimal? @db.Decimal
+  vl_fob_total     Decimal? @db.Decimal
+
+  @@id([tipo, ano, co_mun, sh4])
+}
+
+model aux_municipio_sh4_total {
+  municipio      String   @db.VarChar(10)
+  sh4            String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([municipio, sh4])
+}
+
+model aux_ncm_ano {
+  ano            Int
+  co_ncm         String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([ano, co_ncm])
+}
+
+model aux_ncm_info {
+  co_ncm                       String   @id @db.VarChar(10)
+  descricao                    String?
+  top_5_estados_exportadores   Json?
+  top_5_paises_destino         Json?
+  top_3_vias_transporte_export Json?
+  top_3_urfs_export            Json?
+  top_5_estados_importadores   Json?
+  top_5_paises_origem          Json?
+  top_3_vias_transporte_import Json?
+  top_3_urfs_import            Json?
+  vl_frete_total               Decimal? @db.Decimal
+  vl_seguro_total              Decimal? @db.Decimal
+  vl_frete_medio               Decimal? @db.Decimal
+  vl_seguro_medio              Decimal? @db.Decimal
+}
+
+model aux_ncm_total {
+  co_ncm         String   @id @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+  valor_agregado Decimal? @db.Decimal
+}
+
+model aux_pais_parceiro_ano {
+  ano            Int
+  co_pais        String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([ano, co_pais])
+}
+
+model aux_pais_parceiro_total {
+  co_pais        String   @id @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+}
+
+model aux_valor_agregado_ncm {
+  co_ncm             String   @db.VarChar(10)
+  ano                Int
+  valor_agregado_exp Decimal? @db.Decimal
+  valor_agregado_imp Decimal? @db.Decimal
+
+  @@id([co_ncm, ano])
+}
+
+model aux_valor_agregado_uf {
+  uf                         String @id
+  va_kg_export               Json?
+  va_kg_import               Json?
+  va_unidade_export          Json?
+  va_unidade_import          Json?
+  va_diferenca_export_import Json?
+}
+
+model aux_via_transporte_ano {
+  ano            Int
+  co_via         String   @db.VarChar(10)
+  vl_fob_exp     Decimal? @db.Decimal
+  vl_fob_imp     Decimal? @db.Decimal
+  kg_liquido_exp Decimal? @db.Decimal
+  kg_liquido_imp Decimal? @db.Decimal
+
+  @@id([ano, co_via])
+}
+
+model municipios {
+  co_mun_geo String  @id @db.VarChar(10)
+  no_mun     String? @db.VarChar(255)
+  no_mun_min String? @db.VarChar(255)
+  sg_uf      String? @db.Char(2)
+}
