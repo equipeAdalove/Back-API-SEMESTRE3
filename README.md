@@ -118,19 +118,19 @@ A lógica da API permite consultas e filtros personalizados em tabelas normaliza
 
 Utilizaremos o NCM 84439933 (Cartuchos de revelador (toners))
 
-![alt text](image.png)
+![alt text](public/image.png)
 
 ## Resposta no Swagger
 
 Exibe de maneira mais detalhada
 
-![alt text](image-2.png)
+![alt text](public/image-2.png)
 
 ## Resposta pelo navegador
 
 Apenas por melhor visualização (Google Chrome + Extensão JSONVue)
 
-![alt text](image-1.png)
+![alt text](public/image-1.png)
 
 ---
 
