@@ -80,17 +80,53 @@ export class ImportacaoController {
     description:
       'Filtros personalizados para consulta na tabela importacao (pode incluir qualquer campo da tabela)',
     required: false,
-    example: {
-      co_ano: '2023',
-      co_mes: '12',
-      co_pais: '840',
-    },
   })
-  getRegisterByQuery(
+  async getRegisterByQuery(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
     @Query() query: Record<string, string | undefined>,
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
   ) {
-    return this.importacaoService.findByQueries(query, page, limit);
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 10;
+
+    // Remove os parâmetros de paginação da query antes de passar para o service
+    const { page: _p, limit: _l, ...filters } = query;
+
+    return this.importacaoService.findByQueries(
+      filters,
+      pageNumber,
+      limitNumber,
+    );
+  }
+
+  @Get(':uf/ano/:ano/ranking-produtos')
+  @ApiOperation({ summary: 'Ranking de produtos importados por UF e ano' })
+  getRankingProdutos(
+    @Param('uf') uf: string,
+    @Param('ano', ParseIntPipe) ano: number,
+  ) {
+    return this.importacaoService.getRankingProdutos(uf.toUpperCase(), ano);
+  }
+
+  @Get(':uf/ano/:ano/paises-origem')
+  @ApiOperation({
+    summary: 'Principais países de origem das importações por UF e ano',
+  })
+  getPaisesOrigem(
+    @Param('uf') uf: string,
+    @Param('ano', ParseIntPipe) ano: number,
+  ) {
+    return this.importacaoService.getPaisesOrigem(uf.toUpperCase(), ano);
+  }
+
+  @Get(':uf/ano/:ano/municipios')
+  @ApiOperation({
+    summary: 'Municípios de destino que mais importam na UF e ano',
+  })
+  getMunicipiosDestino(
+    @Param('uf') uf: string,
+    @Param('ano', ParseIntPipe) ano: number,
+  ) {
+    return this.importacaoService.getMunicipiosDestino(uf.toUpperCase(), ano);
   }
 }

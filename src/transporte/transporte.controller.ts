@@ -7,18 +7,49 @@ import { TransporteService } from './transporte.service';
 export class TransporteController {
   constructor(private readonly transporteService: TransporteService) {}
 
-  @Get('ano/:ano')
-  @ApiOperation({
-    summary: 'Mostra o uso das diferentes vias de transporte por ano',
-    description: `Retorna os dados de exportação e importação agrupados por tipo de transporte (marítimo, rodoviário, aéreo, etc.) para o ano especificado.
-`,
-  })
-  @ApiParam({
-    name: 'ano',
-    type: Number,
-    description: 'Ano desejado (ex: 2018)',
-  })
-  getPorAno(@Param('ano') ano: number) {
-    return this.transporteService.getPorAno(+ano);
+  @Get('exportacao/estado/:uf/ano/:ano')
+  getExportacaoEstadoAno(@Param('uf') uf: string, @Param('ano') ano: number) {
+    return this.transporteService.getTopVias(
+      'exportacao',
+      'estado',
+      uf.toUpperCase(),
+      ano,
+    );
+  }
+
+  @Get('exportacao/estado/:uf')
+  getExportacaoEstado(@Param('uf') uf: string) {
+    return this.transporteService.getTopVias('exportacao', 'estado', uf);
+  }
+
+  @Get('exportacao/ncm/:ncm/ano/:ano')
+  getExportacaoNcmAno(@Param('ncm') ncm: string, @Param('ano') ano: number) {
+    return this.transporteService.getTopVias('exportacao', 'ncm', ncm, ano);
+  }
+
+  @Get('exportacao/ncm/:ncm')
+  getExportacaoNcm(@Param('ncm') ncm: string) {
+    return this.transporteService.getTopVias('exportacao', 'ncm', ncm);
+  }
+
+  // Importação
+  @Get('importacao/estado/:uf/ano/:ano')
+  getImportacaoEstadoAno(@Param('uf') uf: string, @Param('ano') ano: number) {
+    return this.transporteService.getTopVias('importacao', 'estado', uf, ano);
+  }
+
+  @Get('importacao/estado/:uf')
+  getImportacaoEstado(@Param('uf') uf: string) {
+    return this.transporteService.getTopVias('importacao', 'estado', uf);
+  }
+
+  @Get('importacao/ncm/:ncm/ano/:ano')
+  getImportacaoNcmAno(@Param('ncm') ncm: string, @Param('ano') ano: number) {
+    return this.transporteService.getTopVias('importacao', 'ncm', ncm, ano);
+  }
+
+  @Get('importacao/ncm/:ncm')
+  getImportacaoNcm(@Param('ncm') ncm: string) {
+    return this.transporteService.getTopVias('importacao', 'ncm', ncm);
   }
 }

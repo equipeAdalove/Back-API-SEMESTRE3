@@ -1,6 +1,8 @@
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from 'src/database/prisma.module';
 import { EstadoModule } from 'src/estado/estado.module';
 import { ExportacaoModule } from 'src/exportacao/exportacao.module';
@@ -12,6 +14,10 @@ import { TransporteModule } from 'src/transporte/transporte.module';
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 5000,
+      isGlobal: true,
+    }),
     ConfigModule.forRoot(),
     ExportacaoModule,
     ImportacaoModule,
@@ -23,6 +29,11 @@ import { TransporteModule } from 'src/transporte/transporte.module';
     PrismaModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}

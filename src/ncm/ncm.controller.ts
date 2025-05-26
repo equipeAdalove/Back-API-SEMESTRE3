@@ -1,6 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Header, Query } from '@nestjs/common';
 import { NcmService } from './ncm.service';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
+import { parse } from 'csv-parse/sync';
 
 @ApiTags('NCM')
 @Controller('ncm')
@@ -65,5 +68,48 @@ export class NcmController {
     @Param('ano') ano: string,
   ) {
     return this.ncmService.getValorAgregadoAno(co_ncm, +ano);
+  }
+
+  @Get('/descricao-ncm/:codigo')
+  @ApiOperation({ summary: 'Obter nome do NCM a partir do código' })
+  @ApiParam({ name: 'codigo', description: 'Código NCM', example: '01012100' })
+  @Header('Content-Type', 'application/json; charset=utf-8') // <- Adicionado
+  getDescricaoNcm(@Param('codigo') codigo: string) {
+    return {
+      codigo,
+      descricao: this.ncmService.getNomeNcmPorCodigo(codigo),
+    };
+  }
+
+  @Get('search')
+  async searchNcm(@Query('q') query: string) {
+    const termo = query?.toLowerCase()?.trim() || '';
+
+    const csvPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'public',
+      'csv',
+      'NCM.csv',
+    );
+    const raw = await fs.promises.readFile(csvPath, 'utf-8');
+
+    const records = parse(raw, {
+      delimiter: ',',
+      columns: true,
+      quote: '"',
+      skip_empty_lines: true,
+      trim: true,
+    });
+
+    const resultados = records
+      .filter(
+        (item: any) =>
+          item.no_ncm_por && item.no_ncm_por.toLowerCase().includes(termo),
+      )
+      .slice(0, 10);
+
+    return resultados;
   }
 }
