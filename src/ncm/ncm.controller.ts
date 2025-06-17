@@ -85,6 +85,10 @@ export class NcmController {
   async searchNcm(@Query('q') query: string) {
     const termo = query?.toLowerCase()?.trim() || '';
 
+    if (termo.length < 3) {
+      return [];
+    }
+
     const csvPath = path.resolve(
       __dirname,
       '..',
@@ -96,18 +100,19 @@ export class NcmController {
     const raw = await fs.promises.readFile(csvPath, 'utf-8');
 
     const records = parse(raw, {
-      delimiter: ',',
       columns: true,
-      quote: '"',
       skip_empty_lines: true,
+      delimiter: ',',
+      quote: '"',
       trim: true,
     });
 
     const resultados = records
-      .filter(
-        (item: any) =>
-          item.no_ncm_por && item.no_ncm_por.toLowerCase().includes(termo),
-      )
+      .filter((item: any) => item.NO_NCM_POR?.toLowerCase().includes(termo))
+      .map((item: any) => ({
+        co_ncm: item.CO_NCM,
+        no_ncm_por: item.NO_NCM_POR,
+      }))
       .slice(0, 10);
 
     return resultados;
